@@ -20,12 +20,15 @@
 
                     <div class=class="btn-group">
                         <h4>Быстрые ссылки</h4>
-                        <a class="btn btn-outline-secondary" href="#">Кнопка 1</a>
+                        <a class="btn btn-outline-secondary" href="#">Заполнить анкету</a>
                         <a class="btn btn-outline-secondary" href="#">Кнопка 2</a>
+                        {% if user.is_staff %}
+                        <a class="btn btn-outline-secondary" href="#">Опросы</a>
+                        {% endif %}
                     </div>
 
                     {% else %}
-                    <a href="{% url 'users:login' %}">Авторизуйтесь!</a>
+                    <a href="{% url 'users:login' %}">Чтобы продолжить, необходимо авторизоваться</a>
                     {% endif %}
                 </h3>
                 <div class="mb-1 text-muted"></div>
