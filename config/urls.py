@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('questionnaires.urls', namespace='questionnaires')),
     path('users/', include('users.urls', namespace='users')),
+    path('business/', include('business.urls', namespace='business')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
