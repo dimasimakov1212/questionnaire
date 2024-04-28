@@ -20,4 +20,4 @@ class BusinessForm(StyleFormMixin, forms.ModelForm):
 class BusinessAreaForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = BusinessArea
-        fields = ('business_area_title', 'business_area_description', 'business')
+        fields = ('business_area_title', 'business_area_description')

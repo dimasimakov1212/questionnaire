@@ -1,0 +1,28 @@
+{% extends 'questionnaires/base.html' %}
+
+{% block content%}
+
+<div class="col-12">
+    <form class="row" method="post" enctype="multipart/form-data">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3 class="card-title">
+                            Форма для создания сферы деятельности бизнеса {{business.business_title}}
+                            {{business_area.business.business_title}}</h3>
+                        <p>(например, если тип бизнеса - общепит, то сфера деятельности может быть кафе, столовая и т.п.)</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<br>
+{% endblock %}
