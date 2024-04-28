@@ -2,6 +2,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django import forms
 from django.core.exceptions import ValidationError
+
+from business.models import Business, BusinessArea
 from users.models import User
 
 
@@ -41,3 +43,16 @@ class UserForm(StyleFormMixin, UserChangeForm):
         self.fields['password'].widget = forms.HiddenInput()
 
 
+class UserUpdateForm(StyleFormMixin, UserChangeForm):
+    class Meta:
+        model = User
+        fields = ['user_business_area',]
+
+    def __init__(self, business_id, *args, **kwargs):
+        super(UserUpdateForm, self).__init__(*args, **kwargs)
+
+        business = Business.objects.get(id=business_id)
+
+        self.fields['user_business_area'].queryset = BusinessArea.objects.filter(business=business)
+
+        self.fields['password'].widget = forms.HiddenInput()
