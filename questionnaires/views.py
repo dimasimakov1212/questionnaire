@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, UpdateView, ListView, CreateView, DeleteView, DetailView
 
-from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm
+from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm, AnswerForm
 from questionnaires.models import Questionnaire, Question, Answer
 from users.models import User
 
@@ -192,3 +192,69 @@ class QuestionDetail(DetailView):
         context['answers'] = Answer.objects.filter(question=question)
 
         return context
+
+
+def answer_create(request, pk):
+    """ Создание объекта ответ """
+
+    question = Question.objects.get(id=pk)  # получаем объект вопрос
+
+    form = AnswerForm(request.POST)  # класс-метод формы создания объекта
+    data = {'form': form, 'questionnaire': question}  # контекстная информация
+
+    # получаем данные формы
+    if request.method == 'POST':
+
+        if form.is_valid():
+            answer = form.save(commit=False)  # получаем данные из формы
+
+            answer.question = question  # присваиваем ответу объект вопрос
+
+            answer.save()  # сохраняем объект
+
+            pk = question.id  # получаем id вопроса
+
+            # перенаправляем на форму вопроса
+            return redirect('questionnaires:question_detail', pk)
+
+    return render(request, 'questionnaires/answer_form.html', context=data)  # шаблон создания ответа
+
+
+class AnswerUpdate(UpdateView):
+    """ Изменение объекта ответ """
+
+    model = Answer
+    form_class = AnswerForm
+
+    def form_valid(self, form):
+        """ Проверка и сохранение данных """
+
+        if form.is_valid():
+            new_answer = form.save()
+            new_answer.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        question = self.object.question
+        return reverse_lazy('questionnaires:question_detail', kwargs={'pk': question.pk})
+
+
+class AnswerDelete(DeleteView):
+    """ Удаление объекта ответ """
+
+    model = Answer
+
+    def get_context_data(self, **kwargs):
+        """ Определяем контекстную информацию """
+
+        context = super().get_context_data(**kwargs)
+        answer = self.get_object()  # получаем текущий объект ответ
+        context['question'] = answer.question  # объект вопрос
+        context['answer'] = answer  # объект ответ
+
+        return context
+
+    def get_success_url(self):
+        question = self.object.question
+        return reverse_lazy('questionnaires:question_detail', kwargs={'pk': question.pk})

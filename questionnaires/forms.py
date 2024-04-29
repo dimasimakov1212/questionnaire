@@ -1,7 +1,7 @@
 from django import forms
 
 from business.models import BusinessArea
-from questionnaires.models import Questionnaire, Question
+from questionnaires.models import Questionnaire, Question, Answer
 
 
 class UserBusinessForm(forms.ModelForm):
@@ -32,3 +32,13 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         exclude = ('questionnaire',)
+
+
+class AnswerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+
+        super(AnswerForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Answer
+        fields = ('answer',)

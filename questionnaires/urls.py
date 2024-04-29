@@ -3,7 +3,7 @@ from django.urls import path
 from questionnaires.apps import QuestionnairesConfig
 from questionnaires.views import HomePageView, get_user_business, QuestionnaireList, QuestionnaireCreate, \
     QuestionnaireUpdate, QuestionnaireDelete, QuestionnaireDetail, question_create, QuestionUpdate, QuestionDelete, \
-    QuestionDetail
+    QuestionDetail, answer_create, AnswerUpdate, AnswerDelete
 
 app_name = QuestionnairesConfig.name
 
@@ -19,4 +19,7 @@ urlpatterns = [
     path('question_update/<int:pk>/', QuestionUpdate.as_view(), name='question_update'),
     path('question_delete/<int:pk>/', QuestionDelete.as_view(), name='question_delete'),
     path('question_detail/<int:pk>/', QuestionDetail.as_view(), name='question_detail'),
+    path('answer_create/<int:pk>/', answer_create, name='answer_create'),
+    path('answer_update/<int:pk>/', AnswerUpdate.as_view(), name='answer_update'),
+    path('answer_delete/<int:pk>/', AnswerDelete.as_view(), name='answer_delete'),
     ]

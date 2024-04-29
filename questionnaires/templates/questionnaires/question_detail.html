@@ -23,11 +23,11 @@
                 <tbody>
                 {% for answer in answers %}
                 <tr>
-                    <td>{{ answer.question_title }}</td>
+                    <td>{{ answer.answer }}</td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-outline-warning">Редактировать</a>
-                        <a href="#" class="btn btn-sm btn-outline-success">Ответы</a>
-                        <a href="#" class="btn btn-sm btn-outline-danger">Удалить</a>
+                        <a href="{% url 'questionnaires:answer_update' answer.id %}" class="btn btn-sm btn-outline-warning">Редактировать</a>
+                        <a href="#" class="btn btn-sm btn-outline-success">Следующий вопрос</a>
+                        <a href="{% url 'questionnaires:answer_delete' answer.id %}" class="btn btn-sm btn-outline-danger">Удалить</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -37,8 +37,10 @@
     </div>
     <div class="row">
         <div class=class="btn-group">
-            <a href="#" class="btn btn-sm btn-outline-success">Добавить ответ</a>
+            <a href="{% url 'questionnaires:answer_create' question.pk %}" class="btn btn-sm btn-outline-success">Добавить ответ</a>
             <a href="{% url 'questionnaires:questionnaire_detail' question.questionnaire.pk %}" class="btn btn-sm btn-outline-secondary">К вопросам</a>
+            <a href="{% url 'questionnaires:questionnaires_list' %}" class="btn btn-sm btn-outline-secondary">
+                К опросам</a>
         </div>
     </div>
 </div>
