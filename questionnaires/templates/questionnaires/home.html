@@ -23,11 +23,12 @@
                         {% if not user.user_business_area and not user.is_staff %}
                         <a class="btn btn-outline-secondary" href="{% url 'questionnaires:user_business' %}">Для начала нужно заполнить анкету</a>
                         {% endif %}
-                        <a class="btn btn-outline-secondary" href="#">Кнопка 2</a>
 
                         {% if user.is_staff %}
                         <a class="btn btn-outline-secondary" href="{% url 'business:business_list' %}">Бизнес</a>
-                        <a class="btn btn-outline-secondary" href="#">Опросы</a>
+                        <a class="btn btn-outline-secondary" href="{% url 'questionnaires:questionnaires_list' %}">Опросы</a>
+                        {% else %}
+                        <a class="btn btn-outline-secondary" href="#">Кнопка 2</a>
                         {% endif %}
                     </div>
 

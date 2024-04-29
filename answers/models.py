@@ -7,11 +7,12 @@ from users.models import User
 class Action(models.Model):
     """ Модель объекта действие """
 
-    action_question = models.ForeignKey(Question, on_delete=models.CASCADE,
-                                        verbose_name='Вопрос', null=True, blank=True)
-    action_answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='Ответ', null=True, blank=True)
-    action_next_question = models.ForeignKey(Question, on_delete=models.CASCADE,
-                                             verbose_name='Следующий вопрос', null=True, blank=True)
+    action_question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Вопрос',
+                                        related_name='first_question', null=True, blank=True)
+    action_answer = models.ForeignKey(Answer, on_delete=models.CASCADE,
+                                      verbose_name='Ответ', null=True, blank=True)
+    action_next_question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Следующий вопрос',
+                                             related_name='next_question', null=True, blank=True)
 
     def __str__(self):
         return f'{self.action_question} - {self.action_answer}'

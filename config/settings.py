@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'business',
     'questionnaires',
+    'answers',
 ]
 
 MIDDLEWARE = [

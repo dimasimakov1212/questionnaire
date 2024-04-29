@@ -1,0 +1,39 @@
+{% extends 'questionnaires/base.html' %}
+
+{% block content%}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-12">
+            <h3>Список опросов</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Название опроса</th>
+                    <th scope="col">Описание опроса</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for questionnaire in questionnaires %}
+                <tr>
+                    <td>{{ questionnaire.questionnaire_title }}</td>
+                    <td>{{ questionnaire.questionnaire_text }}</td>
+                    <td>
+                        <a href="{% url 'questionnaires:questionnaire_update' questionnaire.pk %}" class="btn btn-sm btn-outline-warning">Редактировать</a>
+                        <a href="#" class="btn btn-sm btn-outline-success">Вопросы</a>
+                        <a href="{% url 'questionnaires:questionnaire_delete' questionnaire.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <a href="{% url 'questionnaires:questionnaire_create' %}" class="btn btn-sm btn-outline-success">Добавить опрос</a>
+    </div>
+</div>
+<br>
+{% endblock %}
