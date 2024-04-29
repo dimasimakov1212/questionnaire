@@ -12,6 +12,7 @@
                 <tr>
                     <th scope="col">Название опроса</th>
                     <th scope="col">Описание опроса</th>
+                    <th scope="col">Статус опроса</th>
                     <th scope="col">Действия</th>
                 </tr>
                 </thead>
@@ -19,10 +20,15 @@
                 {% for questionnaire in questionnaires %}
                 <tr>
                     <td>{{ questionnaire.questionnaire_title }}</td>
-                    <td>{{ questionnaire.questionnaire_text }}</td>
+                    <td>{{ questionnaire.questionnaire_text|truncatechars:50 }}</td>
+                    {% if questionnaire.is_public %}
+                    <td>Опубликован</td>
+                    {% else %}
+                    <td>Не опубликован</td>
+                    {% endif %}
                     <td>
                         <a href="{% url 'questionnaires:questionnaire_update' questionnaire.pk %}" class="btn btn-sm btn-outline-warning">Редактировать</a>
-                        <a href="#" class="btn btn-sm btn-outline-success">Вопросы</a>
+                        <a href="{% url 'questionnaires:questionnaire_detail' questionnaire.pk %}" class="btn btn-sm btn-outline-success">Вопросы</a>
                         <a href="{% url 'questionnaires:questionnaire_delete' questionnaire.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
                     </td>
                 </tr>

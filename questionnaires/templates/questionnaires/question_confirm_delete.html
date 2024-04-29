@@ -1,0 +1,23 @@
+{% extends "questionnaires/base.html" %}
+
+{% block content %}
+
+    <div class="col-lg-4 col-md-8">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <h4 class="card-title">Хотите удалить вопрос: </h4>
+                            <p>{{question.question_title}} ?</p>
+                            <button type="submit" class="btn btn-danger">Подтвердить</button>
+                            <a class="btn btn-warning" href="{% url 'questionnaires:questionnaire_detail' questionnaire.pk %}">Отмена</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<br>
+{% endblock %}

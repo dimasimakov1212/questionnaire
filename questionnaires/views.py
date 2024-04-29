@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views.generic import TemplateView, UpdateView, ListView, CreateView, DeleteView
+from django.views.generic import TemplateView, UpdateView, ListView, CreateView, DeleteView, DetailView
 
-from questionnaires.forms import UserBusinessForm, QuestionnaireForm
-from questionnaires.models import Questionnaire
+from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm
+from questionnaires.models import Questionnaire, Question, Answer
 from users.models import User
 
 
@@ -43,6 +43,19 @@ class QuestionnaireList(ListView):
     template_name = 'questionnaires/questionnaires_list.html'
     context_object_name = 'questionnaires'
 
+    def get_queryset(self, *args, **kwargs):
+        """ Определяем порядок вывода объектов """
+
+        queryset = super().get_queryset(*args, **kwargs)
+
+        user = self.request.user  # получаем текущего пользователя
+
+        # если пользователь не является сотрудником, выводим только опубликованные опросы
+        if not user.is_staff:
+            queryset = queryset.filter(is_public=True)
+
+        return queryset
+
 
 class QuestionnaireCreate(CreateView):
     """ Создание объекта опрос """
@@ -80,8 +93,102 @@ class QuestionnaireUpdate(UpdateView):
         return super().form_valid(form)
 
 
+class QuestionnaireDetail(DetailView):
+    """ Просмотр деталей опроса со списком вопросов """
+
+    model = Questionnaire
+    context_object_name = 'questionnaire'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        questionnaire = self.get_object()
+        context['questions'] = Question.objects.filter(questionnaire=questionnaire)
+
+        return context
+
+
 class QuestionnaireDelete(DeleteView):
     """ Удаление объекта опрос """
 
     model = Questionnaire
     success_url = reverse_lazy('questionnaires:questionnaires_list')
+
+
+def question_create(request, pk):
+    """ Создание объекта вопрос """
+
+    questionnaire = Questionnaire.objects.get(id=pk)  # получаем объект опрос
+
+    form = QuestionForm(request.POST)  # класс-метод формы создания объекта
+    data = {'form': form, 'questionnaire': questionnaire}  # контекстная информация
+
+    # получаем данные формы
+    if request.method == 'POST':
+
+        if form.is_valid():
+            question = form.save(commit=False)  # получаем данные из формы
+
+            question.questionnaire = questionnaire  # присваиваем вопросу объект опрос
+
+            question.save()  # сохраняем объект
+
+            pk = questionnaire.id  # получаем id опроса
+
+            # перенаправляем на форму опроса
+            return redirect('questionnaires:questionnaire_detail', pk)
+
+    return render(request, 'questionnaires/question_form.html', context=data)  # шаблон создания вопроса
+
+
+class QuestionUpdate(UpdateView):
+    """ Изменение объекта вопрос """
+
+    model = Question
+    form_class = QuestionForm
+
+    def form_valid(self, form):
+        """ Проверка и сохранение данных """
+
+        if form.is_valid():
+            new_question = form.save()
+            new_question.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        questionnaire = self.object.questionnaire
+        return reverse_lazy('questionnaires:questionnaire_detail', kwargs={'pk': questionnaire.pk})
+
+
+class QuestionDelete(DeleteView):
+    """ Удаление объекта вопрос """
+
+    model = Question
+
+    def get_context_data(self, **kwargs):
+        """ Определяем контекстную информацию """
+
+        context = super().get_context_data(**kwargs)
+        question = self.get_object()  # получаем текущий объект вопрос
+        context['questionnaire'] = question.questionnaire  # объект опрос
+        context['question'] = question  # объект вопрос
+
+        return context
+
+    def get_success_url(self):
+        questionnaire = self.object.questionnaire
+        return reverse_lazy('questionnaires:questionnaire_detail', kwargs={'pk': questionnaire.pk})
+
+
+class QuestionDetail(DetailView):
+    """ Просмотр деталей вопроса со списком ответов """
+
+    model = Question
+    context_object_name = 'question'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        question = self.get_object()
+        context['answers'] = Answer.objects.filter(question=question)
+
+        return context
