@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, UpdateView
 
-from business.models import Business, BusinessArea
 from questionnaires.forms import UserBusinessForm
 from users.models import User
 
