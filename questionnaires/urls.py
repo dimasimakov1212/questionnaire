@@ -18,6 +18,8 @@ urlpatterns = [
     path('questionnaire_detail/<int:pk>/', QuestionnaireDetail.as_view(), name='questionnaire_detail'),
     path('question_create/<int:pk>/', question_create, name='question_create'),
     path('question_update/<int:pk>/', QuestionUpdate.as_view(), name='question_update'),
+    # path('question_update/<int:pk>/', question_update_view, name='question_update'),
+
     path('question_delete/<int:pk>/', QuestionDelete.as_view(), name='question_delete'),
     path('question_detail/<int:pk>/', QuestionDetail.as_view(), name='question_detail'),
     path('answer_create/<int:pk>/', answer_create, name='answer_create'),

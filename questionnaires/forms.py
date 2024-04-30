@@ -32,7 +32,7 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
 
-        fields = ('question_title', 'question_text', 'is_first')
+        fields = ('question_title', 'question_text',)
 
 
 class FirstQuestionForm(forms.ModelForm):
@@ -60,6 +60,7 @@ class UserAnswerForm(forms.ModelForm):
 
         super(UserAnswerForm, self).__init__(*args, **kwargs)
 
+        # в поле answer выводим только объекты с вязанные с текущим вопросом
         self.fields['answer'].queryset = Answer.objects.filter(question=question)
 
     class Meta:

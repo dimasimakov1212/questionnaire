@@ -1,10 +1,12 @@
 from random import sample
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, UpdateView, ListView, CreateView, DeleteView, DetailView
 
-from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm, AnswerForm, UserAnswerForm
+from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm, AnswerForm, UserAnswerForm, \
+    FirstQuestionForm
 from questionnaires.models import Questionnaire, Question, Answer, UserAnswer
 
 
@@ -73,6 +75,7 @@ class QuestionnaireList(ListView):
     """ Список объектов опрос """
 
     model = Questionnaire
+
     template_name = 'questionnaires/questionnaires_list.html'
     context_object_name = 'questionnaires'
 
@@ -94,6 +97,7 @@ class QuestionnaireCreate(CreateView):
     """ Создание объекта опрос """
 
     model = Questionnaire
+
     form_class = QuestionnaireForm
     template_name = 'questionnaires/questionnaire_form.html'
 
@@ -113,6 +117,7 @@ class QuestionnaireUpdate(UpdateView):
     """ Изменение объекта опрос """
 
     model = Questionnaire
+
     form_class = QuestionnaireForm
     success_url = reverse_lazy('questionnaires:questionnaires_list')
 
@@ -134,7 +139,9 @@ class QuestionnaireDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        questionnaire = self.get_object()
+
+        questionnaire = self.get_object()  # получаем объект опрос
+
         context['questions'] = Question.objects.filter(questionnaire=questionnaire)
 
         return context
@@ -152,7 +159,14 @@ def question_create(request, pk):
 
     questionnaire = Questionnaire.objects.get(id=pk)  # получаем объект опрос
 
-    form = QuestionForm(request.POST)  # класс-метод формы создания объекта
+    first_question = Question.objects.get(questionnaire=questionnaire, is_first=True)
+
+    if first_question:
+        form = QuestionForm(request.POST)  # класс-метод формы создания объекта
+
+    else:
+        form = FirstQuestionForm(request.POST)  # класс-метод формы создания объекта
+
     data = {'form': form, 'questionnaire': questionnaire}  # контекстная информация
 
     # получаем данные формы
@@ -180,6 +194,33 @@ class QuestionUpdate(UpdateView):
 
     form_class = QuestionForm
 
+    def get_form_class(self):
+        """ Переопределяем форму объекта """
+
+        question = self.get_object()  # получаем объект вопрос
+
+        questionnaire = question.questionnaire  # получаем объект опрос
+
+        # находим первый вопрос
+        first_question = Question.objects.filter(questionnaire=questionnaire, is_first=True)
+
+        # если первого вопроса не существует
+        if not first_question:
+
+            # передаем форму редактирования первого вопроса
+            return FirstQuestionForm
+
+        # если вопрос является первым
+        if question.is_first:
+
+            # передаем форму редактирования первого вопроса
+            return FirstQuestionForm
+
+        else:
+
+            # в остальных случаях передаем форму редактирования вторичного вопроса
+            return QuestionForm
+
     def form_valid(self, form):
         """ Проверка и сохранение данных """
 
@@ -190,7 +231,9 @@ class QuestionUpdate(UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        questionnaire = self.object.questionnaire
+
+        questionnaire = self.object.questionnaire  # получаем объект опрос
+
         return reverse_lazy('questionnaires:questionnaire_detail', kwargs={'pk': questionnaire.pk})
 
 
@@ -210,7 +253,9 @@ class QuestionDelete(DeleteView):
         return context
 
     def get_success_url(self):
-        questionnaire = self.object.questionnaire
+
+        questionnaire = self.object.questionnaire  # получаем объект опрос
+
         return reverse_lazy('questionnaires:questionnaire_detail', kwargs={'pk': questionnaire.pk})
 
 
@@ -218,18 +263,18 @@ class QuestionDetail(DetailView):
     """ Просмотр деталей вопроса со списком ответов """
 
     model = Question
+
     context_object_name = 'question'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        question = self.get_object()
+
+        question = self.get_object()  # получаем объект вопрос
+
+        # получаем ответы к данному вопросу
         answers = Answer.objects.filter(question=question)
 
-        # next_questions = get_next_question(answers)
-        # print(next_questions)
-
         context['answers'] = answers
-        # context['next_questions'] = next_questions
 
         return context
 
@@ -264,6 +309,7 @@ class AnswerUpdate(UpdateView):
     """ Изменение объекта ответ """
 
     model = Answer
+
     form_class = AnswerForm
 
     def form_valid(self, form):
@@ -276,7 +322,9 @@ class AnswerUpdate(UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        question = self.object.question
+
+        question = self.object.question  # получаем объект вопрос
+
         return reverse_lazy('questionnaires:question_detail', kwargs={'pk': question.pk})
 
 
@@ -296,7 +344,9 @@ class AnswerDelete(DeleteView):
         return context
 
     def get_success_url(self):
-        question = self.object.question
+
+        question = self.object.question  # получаем объект вопрос
+
         return reverse_lazy('questionnaires:question_detail', kwargs={'pk': question.pk})
 
 

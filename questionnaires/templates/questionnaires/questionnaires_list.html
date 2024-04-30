@@ -27,9 +27,14 @@
                     <td>Не опубликован</td>
                     {% endif %}
                     <td>
-                        <a href="{% url 'questionnaires:questionnaire_update' questionnaire.pk %}" class="btn btn-sm btn-outline-warning">Редактировать</a>
-                        <a href="{% url 'questionnaires:questionnaire_detail' questionnaire.pk %}" class="btn btn-sm btn-outline-success">Вопросы</a>
-                        <a href="{% url 'questionnaires:questionnaire_delete' questionnaire.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                        <a href="{% url 'questionnaires:questionnaire_update' questionnaire.pk %}"
+                           class="btn btn-sm btn-outline-warning">Редактировать</a>
+                        <a href="{% url 'questionnaires:questionnaire_detail' questionnaire.pk %}"
+                           class="btn btn-sm btn-outline-success">Вопросы</a>
+                        <a href="{% url 'questionnaires:questionnaire_delete' questionnaire.pk %}"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                        <a href="{% url 'questionnaires:user_first_answer_create' questionnaire.pk %}"
+                           class="btn btn-sm btn-outline-secondary">Тестировать</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -38,7 +43,8 @@
         </div>
     </div>
     <div class="row">
-        <a href="{% url 'questionnaires:questionnaire_create' %}" class="btn btn-sm btn-outline-success">Добавить опрос</a>
+        <a href="{% url 'questionnaires:questionnaire_create' %}" class="btn btn-sm btn-outline-success">Добавить
+            опрос</a>
     </div>
 </div>
 <br>
