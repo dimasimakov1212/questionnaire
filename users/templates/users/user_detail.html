@@ -1,0 +1,37 @@
+{% extends 'questionnaires/base.html' %}
+{% block content%}
+
+<div class="container" style="border:1px solid #cecece; border-radius: 4px; background-color:#b2dfdb;">
+
+    {% if is_owner %}
+    <div class="row mt-4 mb-4">
+
+    </div>
+    {% endif %}
+
+    <!-- Правая часть с информацией о юзере -->
+    <div class="col-md-9">
+        <br>
+
+        <p><b>Имя:</b> {{user.first_name}} </p>
+        <p><b>Электронная почта:</b> {{user.user_email}} </p>
+        <p><b>Сфера деятельности:</b>
+            {% if user.user_business_area %}
+            {{ user.user_business_area }}
+            {% else %}
+            Чтобы определить сферу вашей деятельности, необходимо заполнить анкету (на главной странице - быстрые ссылки)
+            {% endif %}
+        </p>
+        <p><b>Телефон для связи:</b> {{user.user_phone}}</p>
+
+    </div>
+
+</div>
+<br>
+<div>
+    <a class="btn btn-outline-dark me-2" href="{% url 'users:user_profile' user.pk %}">Редактировать</a>
+</div>
+<br>
+
+
+{% endblock %}

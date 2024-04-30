@@ -1,0 +1,53 @@
+{% extends 'questionnaires/base.html' %}
+
+{% block content%}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-10">
+            <h2>{{ question.question_title }}</h2>
+            <p>Описание: {{ question.question_text|truncatechars:50 }}</p>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h3>Ответы</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Ответ</th>
+                    <th scope="col">Следующий вопрос</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for answer in answers %}
+                <tr>
+                    <td>{{ answer.answer }}</td>
+                    {% if answer.next_question %}
+                    <td>{{ answer.next_question.question_title }}</td>
+                    {% else %}
+                    <td>Не задан</td>
+                    {% endif %}
+                    <td>
+                        <a href="{% url 'questionnaires:answer_update' answer.id %}" class="btn btn-sm btn-outline-warning">Редактировать</a>
+                        <a href="{% url 'questionnaires:answer_delete' answer.id %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class=class="btn-group">
+            <a href="{% url 'questionnaires:answer_create' question.pk %}" class="btn btn-sm btn-outline-success">Добавить ответ</a>
+            <a href="{% url 'questionnaires:questionnaire_detail' question.questionnaire.pk %}" class="btn btn-sm btn-outline-secondary">К вопросам</a>
+            <a href="{% url 'questionnaires:questionnaires_list' %}" class="btn btn-sm btn-outline-secondary">
+                К опросам</a>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}

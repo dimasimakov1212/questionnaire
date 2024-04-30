@@ -1,0 +1,33 @@
+{% extends 'questionnaires/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="col-12">
+    <form class="row" method="post" enctype="multipart/form-data" >
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+
+                        <h3 class="card-title">Выберите тип бизнеса</h3>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+
+                    <button type="submit" class="btn btn-success">Продолжить</button>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<!-- Отладочный вывод
+<p>Debug: Category ID - {{ category.id }}</p>-->
+
+{% endblock content %}

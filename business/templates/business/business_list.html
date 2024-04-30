@@ -1,0 +1,22 @@
+{% extends "questionnaires/base.html" %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header card-header-secondary">
+            <h4 class="card-title">Тип бизнеса</h4>
+            {% if user.is_staff %}
+            <a href="{% url 'business:business_create' %}">Добавить тип бизнеса</a>
+            {% endif %}
+        </div>
+        <ul>
+            {% for business in businesses %}
+                <li class="card-body">{{ business.business_title }} |
+                    <a href="{% url 'business:business_detail' business.id %}" class="text-success">Список сфер деятельности бизнеса</a> |
+                    <a href="{% url 'business:business_update' business.id %}" class="text-warning">Редактировать</a> |
+                    <a href="{% url 'business:business_delete' business.id %}" class="text-danger">Удалить</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+<br>
+{% endblock content %}
