@@ -1,6 +1,4 @@
-from django.contrib.auth.views import LogoutView
 from django.urls import path
-
 
 from business.apps import BusinessConfig
 from business.views import BusinessList, BusinessCreate, BusinessDetail, BusinessUpdate, BusinessDeleteView, \

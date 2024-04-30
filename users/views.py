@@ -8,20 +8,32 @@ from users.models import User
 
 
 class UserLoginView(LoginView):
+    """ Авторизация пользователя """
+
     model = User
+
     template_name = 'users/login.html'
+
     form_class = UserLoginForm
 
 
 class UserRegisterView(CreateView):
+    """ Регистрация пользователя """
+
     model = User
+
     form_class = UserRegisterForm
+
     template_name = 'users/register.html'
+
     success_url = reverse_lazy('users:login')
 
 
 class UserProfileView(UpdateView):
+    """ Изменение профиля пользователя """
+
     model = User
+
     form_class = UserForm
 
     def get_object(self, queryset=None):
@@ -32,6 +44,8 @@ class UserProfileView(UpdateView):
 
 
 class UserDetailView(DetailView):
+    """ Информация о пользователе """
+
     model = User
 
     def get_object(self, queryset=None):

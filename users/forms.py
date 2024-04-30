@@ -1,7 +1,5 @@
-from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django import forms
-from django.core.exceptions import ValidationError
 
 from business.models import Business, BusinessArea
 from users.models import User
