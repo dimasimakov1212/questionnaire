@@ -17,15 +17,20 @@
                 <thead>
                 <tr>
                     <th scope="col">Вопрос</th>
-                    <th scope="col">Описание вопроса</th>
+                    <th scope="col">Признак вопроса</th>
                     <th scope="col">Действия</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for question in questions %}
                 <tr>
-                    <td>{{ question.question_title }}</td>
-                    <td>{{ question.question_text|truncatechars:50 }}</td>
+                    <td>{{ question.question_title }}
+                    </td>
+                    <td>{% if question.is_first %}
+                        Стартовый
+                        {% else %}
+                        Вторичный
+                        {% endif %}</td>
                     <td>
                         <a href="{% url 'questionnaires:question_update' question.id %}"
                            class="btn btn-sm btn-outline-warning">Редактировать</a>

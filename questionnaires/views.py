@@ -1,16 +1,49 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from random import sample
+
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, UpdateView, ListView, CreateView, DeleteView, DetailView
 
-from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm, AnswerForm
-from questionnaires.models import Questionnaire, Question, Answer
-from users.models import User
+from questionnaires.forms import UserBusinessForm, QuestionnaireForm, QuestionForm, AnswerForm, UserAnswerForm
+from questionnaires.models import Questionnaire, Question, Answer, UserAnswer
 
 
 class HomePageView(TemplateView):
     """ Главная страница """
 
     template_name = 'questionnaires/home.html'
+
+    def get_context_data(self, **kwargs):
+        """ Определяем контекстную информацию """
+
+        context = super().get_context_data(**kwargs)
+
+        questionnaires = Questionnaire.objects.filter(is_public=True)  # Получаем все опубликованные опросы
+
+        user = self.request.user  # получаем текущего пользователя
+
+        user_questionnaires = []  # задаем список опросов, в которых участвовал пользователь
+
+        try:
+            user_answers = UserAnswer.objects.filter(user=user)  # Получаем все ответы пользователя в опросах
+
+            # получаем список опросов, в которых участвовал пользователь
+            user_questionnaires = [user_answer.questionnaire for user_answer in user_answers]
+
+        except TypeError:
+            pass
+
+        # если опубликованные опросы есть, выводим случайный опрос на главную страницу
+        if len(questionnaires) >= 1:
+            questionnaire_random = sample(list(questionnaires), 1)[0]  # Получаем 1 случайный опрос
+
+            context['questionnaire_random'] = questionnaire_random  # объект опрос
+
+            # если пользователь уже участвовал в опросе, задаем метку
+            if questionnaire_random in user_questionnaires:
+                context['questionnaire_done'] = True
+
+        return context
 
 
 def get_user_business(request):
@@ -144,6 +177,7 @@ class QuestionUpdate(UpdateView):
     """ Изменение объекта вопрос """
 
     model = Question
+
     form_class = QuestionForm
 
     def form_valid(self, form):
@@ -189,7 +223,13 @@ class QuestionDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         question = self.get_object()
-        context['answers'] = Answer.objects.filter(question=question)
+        answers = Answer.objects.filter(question=question)
+
+        # next_questions = get_next_question(answers)
+        # print(next_questions)
+
+        context['answers'] = answers
+        # context['next_questions'] = next_questions
 
         return context
 
@@ -258,3 +298,103 @@ class AnswerDelete(DeleteView):
     def get_success_url(self):
         question = self.object.question
         return reverse_lazy('questionnaires:question_detail', kwargs={'pk': question.pk})
+
+
+def user_first_answer_create(request, pk):
+    """ Создание объекта ответ пользователя """
+
+    questionnaire = Questionnaire.objects.get(id=pk)  # получаем объект опрос
+
+    # получаем первый вопрос
+    question = Question.objects.get(questionnaire=questionnaire, is_first=True)
+
+    form = UserAnswerForm(question, request.POST)  # класс-метод формы создания объекта
+    data = {'form': form, 'question': question}  # контекстная информация
+
+    # получаем данные формы
+    if request.method == 'POST':
+
+        if form.is_valid():
+            user_answer = form.save(commit=False)  # получаем данные из формы
+
+            user = request.user  # получаем текущего пользователя
+
+            user_answer.user = user  # присваиваем ответу пользователя объект пользователь
+            user_answer.question = question  # присваиваем ответу пользователя объект вопрос
+            user_answer.questionnaire = questionnaire  # присваиваем ответу пользователя объект опрос
+
+            user_answer.save()  # сохраняем объект
+
+            try:
+                # получаем ID следующего вопроса
+                next_question_id = user_answer.answer.next_question.id
+
+            except AttributeError:
+
+                # если следующего вопроса нет, присваиваем None
+                next_question_id = None
+
+            # если есть следующий вопрос, переходим к нему
+            if next_question_id:
+
+                # перенаправляем на форму вопроса
+                return redirect('questionnaires:user_next_answer_create', next_question_id)
+
+            else:
+                # если вопроса нет, перенаправляем на завершающую страницу
+                return redirect('questionnaires:questionnaire_end')
+
+    return render(request, 'questionnaires/useranswer_form.html', context=data)  # шаблон создания ответа
+
+
+def user_next_answer_create(request, next_question_id):
+    """ Создание объекта ответ пользователя """
+
+    # получаем следующий вопрос
+    question = Question.objects.get(id=next_question_id)
+
+    questionnaire = question.questionnaire  # получаем объект опрос
+
+    form = UserAnswerForm(question, request.POST)  # класс-метод формы создания объекта
+    data = {'form': form, 'question': question}  # контекстная информация
+
+    # получаем данные формы
+    if request.method == 'POST':
+
+        if form.is_valid():
+            user_answer = form.save(commit=False)  # получаем данные из формы
+
+            user = request.user  # получаем текущего пользователя
+
+            user_answer.user = user  # присваиваем ответу пользователя объект пользователь
+            user_answer.question = question  # присваиваем ответу пользователя объект вопрос
+            user_answer.questionnaire = questionnaire  # присваиваем ответу пользователя объект опрос
+
+            user_answer.save()  # сохраняем объект
+
+            try:
+                # получаем ID следующего вопроса
+                next_question_id = user_answer.answer.next_question.id
+
+            except AttributeError:
+
+                # если следующего вопроса нет, присваиваем None
+                next_question_id = None
+
+            # если есть следующий вопрос, переходим к нему
+            if next_question_id:
+
+                # перенаправляем на форму вопроса
+                return redirect('questionnaires:user_next_answer_create', next_question_id)
+
+            else:
+                # если вопроса нет, перенаправляем на завершающую страницу
+                return redirect('questionnaires:questionnaire_end')
+
+    return render(request, 'questionnaires/useranswer_form.html', context=data)  # шаблон создания ответа
+
+
+def questionnaire_end_view(request):
+    """ Сообщение о завершении опроса """
+
+    return render(request, 'questionnaires/questionnaire_end.html')

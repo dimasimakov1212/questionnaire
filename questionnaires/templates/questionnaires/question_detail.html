@@ -17,6 +17,7 @@
                 <thead>
                 <tr>
                     <th scope="col">Ответ</th>
+                    <th scope="col">Следующий вопрос</th>
                     <th scope="col">Действия</th>
                 </tr>
                 </thead>
@@ -24,9 +25,13 @@
                 {% for answer in answers %}
                 <tr>
                     <td>{{ answer.answer }}</td>
+                    {% if answer.next_question %}
+                    <td>{{ answer.next_question.question_title }}</td>
+                    {% else %}
+                    <td>Не задан</td>
+                    {% endif %}
                     <td>
                         <a href="{% url 'questionnaires:answer_update' answer.id %}" class="btn btn-sm btn-outline-warning">Редактировать</a>
-                        <a href="#" class="btn btn-sm btn-outline-success">Следующий вопрос</a>
                         <a href="{% url 'questionnaires:answer_delete' answer.id %}" class="btn btn-sm btn-outline-danger">Удалить</a>
                     </td>
                 </tr>
